@@ -8,9 +8,36 @@ import act
 
 # Primary raspberry pi code for driving OODA loop
 
-# consider arduino-cli for controlling the uno from here too if I need different sensing controls
+"""
+Primary function to run StATV robot
+Observe: Using camera to locate air vehicle - use an AprilTag and quadcopter or mount to ceiling
+Orient: Detect if target in view - if so begin/continue MDP policy, otherwise perform spiral search
+
+"""
+def runStATV():
+    pass
+
+class StATV():
+    def __init__():
+        pass
+
+    def checkRep():
+        pass
+
+    def run():
+        pass
+
+    def runSpiral():
+        pass
+
+    def runMDP():
+        pass
+
+    def driveMotors():
+        pass
 
 if __name__ == "__main__":
+    
     while True: 
         start = time.time()
         print(observe.observe())
