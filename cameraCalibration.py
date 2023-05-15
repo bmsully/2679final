@@ -18,7 +18,7 @@ while True:
     frame = vs.read()
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    ret, corners = cv2.findChessboardCorners(gray, (6,4), corners, ret)
+    ret, corners = cv2.findChessboardCorners(gray, (6,4), None)
 
     if ret == True:
         i = i+1
