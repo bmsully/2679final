@@ -8,25 +8,6 @@ import threading
 # event.wait(1)
 ## event.wait() is non-blocking whereas time.sleep() is, this is not good as it wastes time between computation, unless of course we want to block for movement and computation...
 
-# ledpin = 12				# PWM pin connected to LED
-# GPIO.setwarnings(False)			#disable warnings
-# GPIO.setmode(GPIO.BOARD)		#set pin numbering system
-# GPIO.setup(ledpin,GPIO.OUT)
-# pi_pwm = GPIO.PWM(ledpin,1000)		#create PWM instance with frequency
-# pi_pwm.start(0)				#start PWM of required Duty Cycle 
-# while True:
-#     for duty in range(0,101,1):
-#         pi_pwm.ChangeDutyCycle(duty) #provide duty cycle in the range 0-100
-#         time.sleep(0.01)
-#     time.sleep(0.5)
-    
-#     for duty in range(100,-1,-1):
-#         pi_pwm.ChangeDutyCycle(duty)
-#         time.sleep(0.01)
-#     time.sleep(0.5)
-    
-#     break
-
 class Pin():
     def __init__(self, channel, IO, **kwargs):
         """
@@ -43,7 +24,7 @@ class Pin():
         self.IO = IO
         GPIO.setup(channel, IO, **kwargs)
 
-class GPIO(Pin):
+class GPIOPin(Pin):
     def __init__(self, channel, IO):
         """
         Initializes a GPIO pin. Passed to superclass.
@@ -57,7 +38,7 @@ class GPIO(Pin):
     def drivePin(self, value):
         GPIO.output(self.channel, value)
 
-class PWM(Pin):
+class PWMPin(Pin):
     def __init__(self, channel, frequency=450):
         """
         Initializes a PWM pin. Passed to superclass.
@@ -90,15 +71,16 @@ class MotorDriver:
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BOARD)
         # Standby Pin
-        self.STDBY = GPIO(13, GPIO.OUT, GPIO.HIGH) #TODO: Double check the Pull-up/pull down network for pi vs. arduino
+        self.STDBY = GPIOPin(13, GPIO.OUT) #TODO: Double check the Pull-up/pull down network for pi vs. arduino
+        self.STDBY.drivePin(GPIO.HIGH)
         # Right Motor Pins
-        self.PWMA = PWM(32)
-        self.AIN2 = GPIO(16, GPIO.OUT)
-        self.AIN1 = GPIO(15, GPIO.OUT)
+        self.PWMA = PWMPin(32)
+        self.AIN2 = GPIOPin(16, GPIO.OUT)
+        self.AIN1 = GPIOPin(15, GPIO.OUT)
         # Left Motor Pins
-        self.BIN1 = GPIO(18, GPIO.OUT)
-        self.BIN2 = GPIO(22, GPIO.OUT)
-        self.PWMB = PWM(33)
+        self.BIN1 = GPIOPin(18, GPIO.OUT)
+        self.BIN2 = GPIOPin(22, GPIO.OUT)
+        self.PWMB = PWMPin(33)
 
     def driveRight(self, duration):
         self.AIN1.drivePin(GPIO.HIGH)
@@ -106,15 +88,15 @@ class MotorDriver:
         self.PWMA.drivePWM(duration)
     
     def driveLeft(self, duration):
-        self.BIN1.drivePin(GPIO.HIGH)
-        self.BIN2.drivePin(GPIO.LOW)
+        self.BIN1.drivePin(GPIO.LOW)
+        self.BIN2.drivePin(GPIO.HIGH)
         self.PWMB.drivePWM(duration)
     
     def driveBoth(self, duration):
         self.AIN1.drivePin(GPIO.HIGH)
         self.AIN2.drivePin(GPIO.LOW)
-        self.BIN1.drivePin(GPIO.HIGH)
-        self.BIN2.drivePin(GPIO.LOW)
+        self.BIN1.drivePin(GPIO.LOW)
+        self.BIN2.drivePin(GPIO.HIGH)
         rightMotor = threading.Thread(target=self.PWMA.drivePWM, args=(duration,))
         leftMotor = threading.Thread(target=self.PWMB.drivePWM, args=(duration,))
         rightMotor.start()
@@ -123,4 +105,5 @@ class MotorDriver:
         leftMotor.join()
 
     def stop(self):
+        # cleanup GPIO pins
         pass
