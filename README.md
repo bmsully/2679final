@@ -22,6 +22,7 @@ Other files:
 
 - Implement MDP policy making and execution code
 - Fix imutils/cv2 frames, camera frames were not appearing :(
+- Fix GPIO led pin that turns on when inside target zone
 - Implement more robust logging procedures
 - Stream logging and camera frames to external device
 - Better abstractions for FSM & StATV functionalties
